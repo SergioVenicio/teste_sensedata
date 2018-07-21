@@ -1,7 +1,9 @@
+
+from todo_list.config import Config
 from flask import Flask, render_template, request
 
-
 app = Flask(__name__)
+app.config.from_object(Config)
 
 
 @app.route('/')
