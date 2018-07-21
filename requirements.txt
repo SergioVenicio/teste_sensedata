@@ -1,0 +1,17 @@
+click==6.7
+Flask==1.0.2
+itsdangerous==0.24
+Jinja2==2.10
+MarkupSafe==1.0
+Werkzeug==0.14.1
+selenium==3.13.0
+atomicwrites==1.1.5
+attrs==18.1.0
+more-itertools==4.2.0
+pluggy==0.6.0
+py==1.5.4
+pytest==3.6.3
+six==1.11.0
+flask-testing==0.7.1
+urllib3==1.23
+
