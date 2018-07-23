@@ -1,9 +1,10 @@
 from flask import Flask
-from .config import Config
 from flask_migrate import Migrate
-from todo_list.extensions import db
+from flask_sqlalchemy import SQLAlchemy
+
 
 
 app = Flask(__name__)
-app.config.from_object(Config)
+app.config.from_object('todo_list.config.DevelopmentConfig')
+db = SQLAlchemy(app)
 migrate = Migrate(app, db)

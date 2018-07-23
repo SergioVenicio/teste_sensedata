@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="container-fluid" id="add_todo">
+    <div class="row">
+        <div class="col-md">
+            <h3 class="text-center">Adicionar todo</h3>
+            <form class="form">
+                <input id="title" class="form-control" type="text" placeholder="Title">
+                <input id="project" class="form-control" type="text" placeholder="Project">
+                <label for="done">Done:
+                    <input id="done" type="checkbox" name="done" class="form-control">
+                </label>
+                <hr>
+                <div class="btn-wrapper">
+                    <button type="button" class="btn btn-primary">GO</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="container-fluid" id="list_todos">
+    <div class="row">
+        <div class="col">
+          <ul>
+            <li><input type="checkbox">Teste</li>
+            <li><input type="checkbox">Teste</li>
+            <li><input type="checkbox">Teste</li>
+            <li><input type="checkbox">Teste</li>
+          </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
