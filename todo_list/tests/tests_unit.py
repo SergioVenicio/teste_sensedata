@@ -6,6 +6,7 @@ from . import app, db, Todo
 class TestModels(unittest.TestCase):
     def setUp(self):
         app.config.from_object('todo_list.config.TestConfig')
+        app.config.update(LIVESERVER_PORT=5001)
         db.create_all()
         return app
 
