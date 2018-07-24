@@ -1,7 +1,7 @@
 import json
 from . import app, db
 from .models import Todo
-from flask import render_template, request, jsonify, Response
+from flask import render_template, request, jsonify
 from flask_restful import reqparse, abort, Resource, Api
 
 
@@ -38,6 +38,7 @@ class TodoViews(Resource):
     def delete(self, todo_id):
         abort_if_todo_doesnt_exist(todo_id)
         todo = Todo.query.get(todo_id)
+        todo = db.session.merge(todo)
         db.session.delete(todo)
         db.session.commit()
         return '', 204
@@ -95,5 +96,4 @@ api.add_resource(TodoViews, '/todos/<string:todo_id>')
 
 
 if __name__ == '__main__':
-    db.create_all()
-    app.run(debug=True)
+    app.run()

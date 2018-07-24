@@ -10,7 +10,7 @@ class Config:
     TESTING = False
     TEMPLATE_AUTO_RELOAD = False
     SQLALCHEMY_DATABASE_URI = DABASE_URI
-    SQLALCHEMY_TRACK_MODIFICATIONS = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class DevelopmentConfig(Config):
@@ -18,6 +18,15 @@ class DevelopmentConfig(Config):
     TEMPLATE_AUTO_RELOAD = True
 
 
+class TestConfig(Config):
+    DEBUG = True
+    TESTING = False
+    DABASE_URI = 'sqlite:////' + os.path.join(basedir, 'app_test.db')
+    SQLALCHEMY_DATABASE_URI = DABASE_URI
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
+
+
 config = {
-    'development': DevelopmentConfig
+    'development': DevelopmentConfig,
+    'test': TestConfig
 }

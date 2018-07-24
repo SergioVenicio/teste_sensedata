@@ -1,14 +1,44 @@
-function todo_post(input) {
+var _completes = 0;
+var _uncompetles = 0;
+function modal_todo(input) {
+    let id = $(input).attr('data-id');
+    let done = $(input).attr('data-done');
+    $("#modal-delete").modal();
+    $("#confirm-button").on({
+        click: function () {
+            $.ajax({
+                'url': '/todos/' + id,
+                'type': 'delete',
+                'success': function () {
+                    $(input).parent().remove();
+                    if(done == 'true') {
+                        _completes -= 1;
+                        if(_completes <= 0) {
+                            $("#title-completes").hide();
+                        }
+                    } else {
+                        _uncompetles -= 1;
+                        if(_uncompetles <= 0) {
+                            $("#title-uncompletes").hide();
+                        }
+                    }
+                }
+            });
+            $("#modal-delete").modal('hide');
+        }
+    });
+}
+
+function todo_complete(input) {
     let id = $(input).attr('data-id');
     let done = $(input).attr('data-done');
 
-    if(done == 'true') {
-        $(input).attr('data-done', 'false');
-        done = false;
+    if(done == 'false') {
+        done = true;
     } else {
-        $(input).attr('data-done', 'true');
         done = true;
     }
+    $(input).parent().children('button[data-id="' + id + '"]').attr('data-done', done);
 
     $.ajax({
         'url': '/todos/' + id,
@@ -17,9 +47,16 @@ function todo_post(input) {
         'data': {
             'id': id, 'done': done
         },
-        'success': function (data) {
-            console.log(data);
-            alert('Todo alterada com sucesso!');
+        'success': function () {
+            $("#modal-complete").modal();
+            $("#todos-complete").append($(input).parent().parent().parent());
+            $(input).remove();
+            _uncompetles -= 1;
+            _completes += 1;
+            $("#title-completes").show();
+            if(_uncompetles <= 0) {
+                $("#title-uncompletes").hide();
+            }
         }
     })
 }
@@ -35,8 +72,8 @@ $(document).ready( function () {
                'url': '/todos',
                'datatype': 'Json',
                'data': {'title': title, 'project': project, 'done': done},
-               success: function(data) {
-                   console.log(data);
+               success: function() {
+                   $("#modal-save").modal();
                }
            })
        }
@@ -51,13 +88,32 @@ $(document).ready( function () {
                 'success': function (data) {
                     data.forEach(function(todo) {
                         if(todo.done) {
-                            $("#todos").append(
-                                '<li class="todo_available">' + todo.title + ', ' + todo.project + '<input type="checkbox" data-id="' + todo.id + '" data-done="'+ todo.done +'" checked onclick="todo_post(this)">' + '</li>'
-                            )
+                            _completes += 1;
+                            $("#title-completes").show();
+                            let card = "<div class='col-3'>" +
+                                "<div class='card card-todo'>" +
+                                "  <div class='card-body'>" +
+                                "    <h5 class='card-title'>" + todo.project + "</h5>" +
+                                "    <p class='card-text'>" + todo.title  + "</p>" +
+                                "    <button type='button' class='btn btn-danger' onclick='modal_todo(this)' data-id='"+ todo.id +"' data-done='" + todo.done + "'>Delete</button>" +
+                                "  </div>" +
+                                "</div>" +
+                                "</div>";
+                            $("#todos-complete").append(card );
                         } else {
-                            $("#todos").append(
-                                '<li class="todo_available">' + todo.title + ', ' + todo.project + '<input type="checkbox" data-id="' + todo.id + '"  data-done="' + todo.done + '" onclick="todo_post(this)">' + '</li>'
-                            )
+                            _uncompetles += 1;
+                            $("#title-uncompletes").show();
+                            let card = "<div class='col-3'>" +
+                                "<div class='card card-todo'>" +
+                                "  <div class='card-body'>" +
+                                "    <h5 class='card-title'>" + todo.project + "</h5>" +
+                                "    <p class='card-text'>" + todo.title  + "</p>" +
+                                "    <button type='button' class='btn btn-success' onclick='todo_complete(this)' data-id='" + todo.id + "' data-done='" + todo.done + "'>Complete</button>" +
+                                "    <button type='button' class='btn btn-danger' onclick='modal_todo(this)' data-id='"+ todo.id +"' data-done='" + todo.done + "'>Delete</button>" +
+                                "  </div>" +
+                                "</div>" +
+                                "</div>";
+                            $("#todos-uncomplete").append(card);
                         }
                     });
                 }
@@ -66,6 +122,8 @@ $(document).ready( function () {
     });
     $("#back").on({
         click: function () {
+            $("#todos-uncomplete div").remove();
+            $("#todos-complete div").remove();
             $("#add_todo").fadeIn();
             $("#list_todos").hide();
         }

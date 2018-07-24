@@ -5,3 +5,12 @@
 .btn-wrapper {
     text-align: center;
 }
+
+#title-completes, #title-uncompletes {
+    display: none;
+}
+
+.card-todo {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
