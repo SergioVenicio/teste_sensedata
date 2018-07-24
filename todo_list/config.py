@@ -6,15 +6,18 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 DABASE_URI = 'sqlite:////' + os.path.join(basedir, 'app.db')
 
 class Config:
-    DEBUG = True
-    CSRF_ENABLED = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or DABASE_URI
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    DEBUG = False
+    TESTING = False
+    TEMPLATE_AUTO_RELOAD = False
+    SQLALCHEMY_DATABASE_URI = DABASE_URI
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    TEMPLATE_AUTO_RELOAD = True
 
 
-class ProductionConfig(Config):
-    DEBUG = False
+config = {
+    'development': DevelopmentConfig
+}

@@ -1,6 +1,7 @@
+import json
 from . import app, db
 from .models import Todo
-from flask import render_template
+from flask import render_template, request, jsonify, Response
 from flask_restful import reqparse, abort, Resource, Api
 
 
@@ -8,13 +9,9 @@ api = Api(app)
 
 
 def abort_if_todo_doesnt_exist(todo_id):
-    todo = Todo.query.filter_by(id=todo_id)
+    todo = Todo.query.get(todo_id)
     if not todo:
         abort(404, message="Todo {} doesn't exist".format(todo_id))
-
-
-parser = reqparse.RequestParser()
-parser.add_argument('task')
 
 
 @app.route('/')
@@ -23,38 +20,74 @@ def index():
 
 
 class TodoViews(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('title', type=str, location='json')
+    parser.add_argument('project', type=str, location='json')
+    parser.add_argument('done', type=bool, location='json')
+
     def get(self, todo_id):
         abort_if_todo_doesnt_exist(todo_id)
-        return Todo.query.filter_by(id=todo_id)
+        todo = Todo.query.get(todo_id)
+        return jsonify({
+            'id': todo.id,
+            'title': todo.title,
+            'done': todo.done
+            })
+
 
     def delete(self, todo_id):
         abort_if_todo_doesnt_exist(todo_id)
-        todo = Todo.query.filter_by(id=todo_id)
+        todo = Todo.query.get(todo_id)
         db.session.delete(todo)
         db.session.commit()
         return '', 204
 
     def put(self, todo_id):
-        args = parser.parse_args()
-        todo = Todo.query.filter_by(id=todo_id)
-        todo.title = args['title']
-        todo.project = args['project']
-        todo.done = args['done']
-        db.session.add(todo)
+        abort_if_todo_doesnt_exist(todo_id)
+        todo = Todo.query.get(todo_id)
+        done = json.loads(request.form['done'])
+        todo.done = done
+        db.session.merge(todo)
         db.session.commit()
-        return todo, 201
+        return jsonify(
+            id=todo.id,
+            title=todo.title,
+            project=todo.project,
+            done=todo.done
+        )
 
 
 class TodoList(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('title', type=str, location='json')
+    parser.add_argument('project', type=str, location='json')
+    parser.add_argument('done', type=bool, location='json')
+
     def get(self):
-        return Todo.query.all()
+        _todos = Todo.query.all()
+        todos = []
+        [todos.append({
+            'id': todo.id,
+            'title': todo.title,
+            'project': todo.project,
+            'done': todo.done
+        }) for todo in _todos]
+        return jsonify(todos)
+
 
     def post(self):
-        args = parser.parse_args()
-        todo = Todo(args['title'], args['project'], args['done'])
+        title = request.form['title']
+        project = request.form['project']
+        done = json.loads(request.form['done'])
+        todo = Todo(title=title, project=project, done=done)
         db.session.add(todo)
         db.session.commit()
-        return todo, 201
+        return jsonify(
+            id=todo.id,
+            title=todo.title,
+            project=todo.project,
+            done=todo.done
+        )
 
 
 api.add_resource(TodoList, '/todos')
@@ -62,4 +95,5 @@ api.add_resource(TodoViews, '/todos/<string:todo_id>')
 
 
 if __name__ == '__main__':
+    db.create_all()
     app.run(debug=True)
