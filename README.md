@@ -5,9 +5,9 @@
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requeriments.txt
-FLASK_APP=todo_list.py flask db init
-FLASK_APP=todo_list.py flask db migrate
-FLASK_APP=todo_list.py flask db upgrade
+FLASK_APP=todo_list.app.py flask db init
+FLASK_APP=todo_list.app.py flask db migrate
+FLASK_APP=todo_list.app.py flask db upgrade
 ```
 # Tests
 # Full Tests 
